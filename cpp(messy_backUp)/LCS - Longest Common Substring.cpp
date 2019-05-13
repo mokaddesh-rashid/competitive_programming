@@ -1,0 +1,104 @@
+#include <bits/stdc++.h>
+
+using namespace std;
+
+#define mem(a,b) memset(a,b,sizeof(a))
+#define FOR(i,j,k) for(i=j;i<=k;i++)
+#define REV(i,j,k) for(i=j;i>=k;i--)
+#define inf         freopen("in.txt", "r", stdin)
+#define outf        freopen("out.txt", "w", stdout)
+#define pf          printf
+#define sf(n)       scanf("%d", &n)
+#define sff(a,b)    scanf("%d %d", &a, &b)
+#define sfff(a,b,c)    scanf("%d %d %d", &a, &b, &c)
+#define minn          (long long)-9223372036854775807
+#define maxx          (long long) 9223372036854775807
+#define mod          1000000009
+#define LL           long long
+#define NL '\n'
+#define MAX 100005
+#define cnd tree[idx]
+#define lnd (2*idx)
+#define rnd ((2*idx)+1)
+typedef pair<int,int> p_i;
+
+
+//set<int>::iterator ii;
+
+
+struct info
+{
+    int p, x, y;
+}sfx[100010];
+
+
+bool compare(info f, info s)
+{
+    if( f.x != s.x ) return f.x<s.x;
+    else return f.y<s.y;
+}
+
+
+string str;
+int sfx_t[22][100001], n, m, r, l;
+
+
+void call_sort()
+{
+    for(int i = 0; i<n; i++ )
+    {
+        sfx[i].x = sfx_t[r-1][i];
+        sfx[i].y = -1;
+        if( i+l < n )
+            sfx[i].y = sfx_t[r-1][i+l];
+        sfx[i].p = i;
+    }
+    sort( sfx, sfx+n, compare );
+    int v = 0;
+    for(int i=0; i<n; i++ )
+    {
+        if( i > 0 && (sfx[i].x != sfx[i-1].x || sfx[i].y != sfx[i-1].y ) )
+            v++;
+        sfx_t[r][sfx[i].p] = v;
+    }
+
+}
+int main()
+{
+    ios::sync_with_stdio(false);
+
+    //inf;
+    //outf;
+    LL i, j;
+
+    string str;
+
+    cin >> str;
+    n = str.size();
+
+    for( i=0; i<n; i++ )
+        sfx_t[0][i] = str[i];
+
+    m = log(n)/log(2);
+    m++;
+    r = 1;
+    l = 1;
+    while( r <= m )
+    {
+        call_sort();
+        l *= 2;
+        r++;
+    }
+
+    for( i=0; i<n; i++ )
+    {
+        int x = sfx[i].p;
+        cout << x << endl;
+    }
+    return 0;
+
+}
+
+
+
+
