@@ -1,0 +1,81 @@
+#include <bits/stdc++.h>
+
+using namespace std;
+
+#define mem(a,b) memset(a,b,sizeof(a))
+#define FOR(i,j,k) for(int i=j;i<=k;i++)
+#define REV(i,j,k) for(int i=j;i>=k;i--)
+#define FORR(i,j,k,l) for(int i=j;i<=k;i+=l)
+#define inf         freopen("in.txt", "r", stdin)
+#define outf        freopen("out.txt", "w", stdout)
+#define pf          printf
+#define sf(n)       scanf("%d", &n)
+#define sff(a,b)    scanf("%d %d", &a, &b)
+#define sfff(a,b,c)    scanf("%d %d %d", &a, &b, &c)
+#define clean(mat,n)   FOR(i,0,n) mat[i].clear()
+#define minn          (long long)-1000000000000000000
+#define maxx          (long long) 1000000000000000000
+#define M          998244353
+#define M_PI           3.14159265358979323846  /* pi */
+#define LL           long long
+#define NL '\n'
+#define cnd tree[idx]
+#define lnd (idx<<1)
+#define rnd ((idx<<1)+1)
+#define PB push_back
+#define F first
+#define S second
+#define MAX 100010
+#define MP make_pair
+#define valid(nx,ny)  ((nx >= 0) && (nx < row) && (ny >= 0) && (ny < col))
+typedef pair<int,int> PR;
+
+LL dp[MAX], m, n;
+LL cum[MAX + 10];
+
+LL rec(int p)
+{
+    if(p <= 0) return p == 0;
+
+    if(dp[p] != -1) return dp[p];
+
+    dp[p] = 0;
+    FOR(i,1,n) dp[p] += rec(p - i), dp[p] %= M;
+
+    return dp[p];
+}
+
+int main()
+{
+    ios::sync_with_stdio(false);
+    //inf;
+    //outf;
+    LL v = 0;
+    cin >> n;
+
+    cum[1] = 1; cum[n + 1] = -1;
+    FOR(i,0,MAX)
+    {
+        v += M; v += cum[i]; v %= M;
+        cum[i] = v;
+
+        cum[i + 1] += M; cum[i + 1] += v; cum[i + 1] %= M;
+        if(i + n + 1 < MAX)
+        {
+            cum[i + n + 1] += M;
+            cum[i + n + 1] -= v;
+            cum[i + n + 1] %= M;
+        }
+    }
+
+    mem(dp, -1);
+
+    for(;;)
+    {
+        int u;
+        cin >> u;
+        cout << rec( u ) << ' ' << cum[u] << endl;
+    }
+
+    return 0;
+}

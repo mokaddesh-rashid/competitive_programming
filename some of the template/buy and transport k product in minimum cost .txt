@@ -1,0 +1,79 @@
+
+
+
+The marmots need to prepare k problems for HC2 over n days. Each problem, once prepared, also has to be printed.
+
+The preparation of a problem on day i (at most one per day) costs ai CHF, and the printing of a problem on day i (also at most one per day) costs bi CHF. Of course, a problem cannot be printed before it has been prepared (but doing both on the same day is fine).
+
+What is the minimum cost of preparation and printing?
+
+const LL inf = M;
+
+LL A[MAX], B[MAX], n, a[MAX], b[MAX];
+
+PR shit(LL baki)
+{
+    priority_queue<LL, vector<LL>, greater<LL> > sh;
+    priority_queue<LL> pq;
+
+    LL ans = 0, cnt = 0;
+
+    FOR(i,0,n-1)
+    {
+        sh.push( A[i] );
+
+        LL c1 = sh.top() + B[i];
+        LL c2 = pq.empty() ? -M : pq.top();
+        c2 = B[i] - c2;
+
+        if(c1 > 0 && c2 > 0) continue;
+        else if(c1 <= c2)
+        {
+            sh.pop();
+            cnt++; ans += c1;
+        }
+        else
+        {
+            pq.pop();
+            ans += c2;
+        }
+
+        pq.push( B[i] );
+    }
+
+    return {ans, cnt};
+}
+
+
+int main()
+{
+    ios::sync_with_stdio(false);
+    //fin;
+    LL k;
+
+    cin >> n >> k;
+
+    FOR(i,0,n-1) cin >> a[i];
+    FOR(i,0,n-1) cin >> b[i];
+
+    LL st = -inf, en = inf, mid, val = -inf, can = 10;
+
+    while(st <= en)
+    {
+        mid = (LL)(st + en)>>1;
+
+        FOR(i,0,n-1) A[i] = a[i] + mid;
+        FOR(i,0,n-1) B[i] = b[i] + mid;
+
+        if(shit( mid ).S >= k) st = mid + 1, val = max(val, mid);
+        else en = mid - 1;
+    }
+    //val = -6;
+    FOR(i,0,n-1) A[i] = a[i] + val;
+    FOR(i,0,n-1) B[i] = b[i] + val;
+
+    cout << shit(val).F + (shit(val).S * -val * 2) << endl;
+
+    return 0;
+}
+

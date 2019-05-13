@@ -1,0 +1,122 @@
+#include<bits/stdc++.h>
+
+using namespace std;
+
+#define FOR(i,j,k) for(int i=j;i<=k;i++)
+#define MAX 100010
+#define F first
+#define S second
+#define LL long long
+
+typedef pair<int,int> PI;
+typedef pair<int,PI> PR;
+
+
+int sfx[18][MAX];
+LL cnt[MAX];
+string str;
+PR ar[MAX];
+
+bool same(PR x,PR t)
+{
+    if(x.F == t.F && x.S.F == t.S.F) return 1;
+    else return 0;
+}
+
+void sortSuffix(string str)
+{
+    int n = str.size();
+
+    FOR(i,0,n-1) sfx[0][i] = str[i];
+
+    FOR(i,1,17)
+    {
+        int x = 1<<(i - 1);
+        FOR(j,0,n-1)
+        {
+            ar[j].F = sfx[i - 1][j];
+            ar[j].S.F = -1;
+            ar[j].S.S = j;
+
+            if(j + x < n) ar[j].S.F = sfx[i - 1][j + x];
+        }
+        sort(ar, ar + n);
+
+        int p = 0;
+        FOR(j,0,n-1)
+        {
+            if(j != 0) if( !same(ar[j], ar[j - 1]) )p++;
+            sfx[i][ ar[j].S.S ] = p;
+        }
+    }
+}
+
+int lcp(int f,int s,int bs)
+{
+    if(bs == -1) return 0;
+
+    int x = 1<<bs;
+
+    if(max(f, s) + x <= str.size() && sfx[bs][f] == sfx[bs][s]) return x + lcp(f + x, s + x, bs);
+    else return lcp(f, s, bs - 1);
+}
+
+int id[MAX];
+
+int getVal(int p,int len)
+{
+    int st = 0, en = p, mid, ret = p;
+
+    while(st <= en)
+    {
+        int mid = (st + en)>>1;
+
+        if(lcp(id[p], id[mid], 17) >= len) en = mid - 1, ret = min(ret, mid);
+        else st = mid + 1;
+    }
+
+    return ret;
+}
+
+int main()
+{
+    ios::sync_with_stdio(false);
+    ///freopen("in.txt", "r", stdin);
+
+    int tc;
+
+    cin >> tc;
+
+    FOR(tt,1,tc)
+    {
+        memset(cnt, 0, sizeof(cnt));
+
+        int n;
+
+        cin >> str;
+        sortSuffix( str );
+        n = str.size();
+
+        FOR(i,0,n-1) id[i] = ar[i].S.S;
+        FOR(i,0,n-1)
+        {
+            int l = lcp(id[i], id[i + 1], 17), len, v;
+            if(i == n-1) l = 0; l++;
+
+            for(;id[i] + l <= n;)
+            {
+                v = getVal(i, l);
+                len = lcp(id[i], id[v], 17);
+                if(l > len) break;
+
+                cnt[ (i - v) + 1] += (len - l) + 1;
+                l = len + 1;
+            }
+        }
+
+        FOR(i,1,n) cout << "length " << i << " r sob golo unique string r occrance " << cnt[i] << endl;
+
+    }
+
+    return 0;
+}

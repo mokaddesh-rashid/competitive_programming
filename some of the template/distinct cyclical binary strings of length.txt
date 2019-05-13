@@ -1,0 +1,70 @@
+string str;
+int lps[MAX];
+
+void make_lps(string pattern)
+{
+    int n = pattern.size();
+
+    lps[0] = lps[1] = 0;
+    FOR(i,2,n)
+    {
+        int p = lps[i-1];
+        while(true)
+        {
+            if(pattern[i - 1] == pattern[p])
+            {
+                lps[i] = p + 1;
+                break;
+            }
+
+            if(p == 0) break;
+            else p = lps[p];
+        }
+    }
+}
+
+LL dp[44][44][44][2], n, m;
+
+LL rec(int p,int v,int c,int t)
+{
+    if(p == n) return t & c == v;
+
+    LL &temp = dp[p][v][c][t];
+
+    if(temp != -1) return temp;
+    temp = 0;
+
+    int a;
+    for(a = c; str[a] != '0'; a = lps[a])
+        if(a == 0) { a = -1; break;}
+
+    int b;
+    for(b = c; str[b] != '1'; b = lps[b])
+        if(b == 0) {b = -1; break;}
+
+   temp = rec(p + 1, v, a + 1, (a + 1 == m) ? 1 : t) +
+          rec(p + 1, v, b + 1, (b + 1 == m) ? 1 : t);
+
+    return temp;
+}
+
+int main()
+{
+    ios::sync_with_stdio(false);
+    //inf;
+    //outf;
+    mem(dp, -1);
+    int d = 0;
+
+    cin >> n;
+    cin >> str; m = str.size();
+    make_lps( str );
+
+    LL prin = 0;
+
+    FOR(i,0,m)
+        prin += rec(0, i, i, 0);
+
+    cout << prin << endl;
+    return 0;
+}

@@ -1,0 +1,98 @@
+The number of inversions in a permutation is the number of distinct pairs (i,?j) such that 1?=?i?<?j?=?n and ai?>?aj.
+query is swap value of two position
+
+#include <ext/pb_ds/assoc_container.hpp> // Common file
+#include <ext/pb_ds/tree_policy.hpp> // Including tree_order_statistics_node_update
+using namespace __gnu_pbds;
+
+template<typename T> using ordered_set =
+    tree<T, null_type, less<T>, rb_tree_tag, tree_order_statistics_node_update>;
+
+ordered_set<int> seg[4*MAX];
+
+int ara[MAX], n;
+
+void update(int idx,int b,int e,int p,int t)
+{
+    if(b > p || e < p) return;
+
+    if(t) seg[idx].insert( ara[p] );
+    else seg[idx].erase( ara[p] );
+
+    if(b == e) return;
+
+    int m = (b + e)>>1;
+
+    update(lnd, b, m, p, t);
+    update(rnd, m + 1, e, p, t);
+
+}
+
+int query(int idx,int b,int e,int l,int v)
+{
+    if(b > l) return 0;
+
+    if(e <= l)
+    {
+        int ret = (e - b) + 1 - seg[idx].order_of_key(v + 1);
+        return ret;
+    }
+
+    int m = (b + e)>>1;
+    return query(lnd, b, m, l, v) + query(rnd, m + 1, e, l, v);
+}
+
+int greaterThanL(int l,int st,int en)
+{
+    if(st > en) return 0;
+    return query(1, 0, n-1, en, ara[l]) - query(1, 0, n-1, st - 1, ara[l]);
+}
+
+int lesserThanL(int l,int st,int en)
+{
+    if(st > en) return 0;
+    return ((en - st) + 1) - greaterThanL(l, st, en);
+}
+
+int main()
+{
+    ios::sync_with_stdio(false);
+    //inf;
+    //outf;
+    int q, u, v;
+    LL prin = 0;
+
+    sf(n);
+    FOR(i,0,n-1) ara[i] = i;
+
+    FOR(i,0,n-1) update(1, 0, n-1, i, 1);
+
+
+    sf(q);
+    FOR(oo,0,q-1)
+    {
+        sff(u, v);
+        u--; v--;
+        if(u > v) swap(u, v);
+
+        update(1, 0, n-1, u, 0);
+        update(1, 0, n-1, v, 0);
+
+        prin -= lesserThanL(u, u + 1, v - 1);
+        prin += greaterThanL(u, u + 1, v - 1);
+
+        prin += lesserThanL(v, u + 1, v - 1);
+        prin -= greaterThanL(v, u + 1, v - 1);
+
+        if(ara[u] < ara[v]) prin++;
+        else if(u != v) prin--;
+
+        swap(ara[u], ara[v]);
+        update(1, 0, n-1, u, 1);
+        update(1, 0, n-1, v, 1);
+
+        pf("%lld\n", prin);
+    }
+
+    return 0;
+}

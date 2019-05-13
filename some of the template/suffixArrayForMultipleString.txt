@@ -1,0 +1,162 @@
+value of each string is f(s) = SUM(i = 1 -> n) COST(i)*occurance of string s in ith string*length of s
+
+print the maximum value of f(s) where s = 1 -> n
+
+
+#include<bits/stdc++.h>
+
+using namespace std;
+
+#define FOR(i,j,k) for(LL i=j;i<=k;i++)
+#define LL long long
+#define MAX 1000010
+
+struct PR
+{
+    int f, s, p;
+};
+
+class Compare
+{
+public:
+    bool operator()(PR x,PR y)
+    {
+        if(x.f == y.f) return x.s < y.s;
+        else return x.f < y.f;
+    }
+};
+
+int sfx[21][MAX];
+string str;
+PR ar[MAX];
+
+bool same(PR p,PR t)
+{
+    if(p.f == t.f && p.s == t.s) return 1;
+    else return 0;
+}
+
+void sortSuffix(string str)
+{
+    int n = str.size();
+
+    FOR(i,0,n-1) sfx[0][i] = str[i];
+
+    FOR(i,1,20)
+    {
+        int x = 1<<(i - 1);
+        FOR(j,0,n-1)
+        {
+            ar[j].f = sfx[i - 1][j];
+            ar[j].s = -1;
+            ar[j].p = j;
+
+            if(j + x < n) ar[j].s = sfx[i - 1][j + x];
+        }
+        sort(ar, ar + n, Compare());
+
+        int p = 0;
+        FOR(j,0,n-1)
+        {
+            if(j != 0) if( !same(ar[j], ar[j - 1]) )p++;
+            sfx[i][ ar[j].p ] = p;
+        }
+    }
+//    cout << str << endl;
+//    FOR(i,0,n-1) cout << ar[i].p << ' ';
+//    cout << endl;
+
+}
+
+int lcp(int f,int s,int bs)
+{
+    if(bs == -1) return 0;
+
+    int x = 1<<bs;
+
+    if(max(f, s) + x <= str.size() && sfx[bs][f] == sfx[bs][s]) return x + lcp(f + x, s + x, bs);
+    else return lcp(f, s, bs - 1);
+}
+
+int cost[MAX], val[MAX], lim[MAX];
+LL sum[MAX];
+string pattern[MAX];
+
+int lcpVal(int i,int j)
+{
+    int ret = min(lim[i] - i, lim[j] - j);
+    return min(ret, lcp(i, j, 20));
+}
+
+int main()
+{
+    ios::sync_with_stdio(false);
+   /// freopen("in.txt", "r", stdin);
+    int p = 0, q;
+
+    cin >> q;
+    FOR(i,0,q-1) cin >> pattern[i];
+    FOR(i,0,q-1) cin >> cost[i];
+
+    FOR(i,0,q-1)
+    {
+        if(i) str += "$";
+        str += pattern[i];
+        while( p < (int)str.size() )
+        {
+            if(str[p] != '$') val[p] = cost[i];
+            lim[p] = str.size();
+            p++;
+        }
+    }
+
+    sortSuffix( str );
+
+    LL n = str.size(), c = 0, x, prin = 0;
+
+    FOR(i,0,n-1)
+    {
+        p = ar[i].p;
+        c += val[p]; sum[i] = c;
+    }
+
+    FOR(i,0,n-1)
+    {
+        p = ar[i].p;
+        q = ar[i + 1].p;
+
+        if(i == n - 1) x = 0;
+        else x = lcpVal(p, q);
+
+        LL pv = 0;
+        if(str[p] != '$')
+        while(true)
+        {
+           x++;
+           if(p + x > lim[p]) break;
+
+           LL st = pv, en = i, mid, ad = i, px;
+
+           while(st <= en)
+           {
+               mid = (st + en)>>1;
+               LL voo = lcpVal(ar[mid].p, p);
+               if(voo >= x) en = mid - 1, ad = min(mid, ad), px = voo;
+               else st = mid + 1;
+           }
+
+           x = px;
+           pv = ad;
+
+           LL cm = sum[i];
+           if(ad) cm -= sum[ad - 1];
+          // cout << cm << ' ' << x << endl;
+           prin = max(prin, cm * x);
+        }
+    }
+
+    cout << prin << endl;
+
+
+    return 0;
+}

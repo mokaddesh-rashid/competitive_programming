@@ -1,0 +1,52 @@
+There are n cities located along the one-way road. Cities are numbered from 1 to n in the direction of the road.
+
+The i-th city had produced pi units of goods. No more than si units of goods can be sold in the i-th city.
+
+For each pair of cities i and j such that 1?=?i?<?j?=?n you can no more than once transport no more than c units of goods from the city i to the city j. Note that goods can only be transported from a city with a lesser index to the city with a larger index. You can transport goods between cities in any order.
+
+Determine the maximum number of produced goods that can be sold in total in all the cities after a sequence of transportations.
+
+
+LL go[MAX], dp[MAX], A[MAX], B[MAX];
+const LL INF = 1e18;
+
+int main()
+{
+    ios::sync_with_stdio(false);
+   /// inf;
+    //outf;
+    ///cout << INF << endl;
+
+    int n;
+    LL c;
+
+    cin >> n >> c;
+    FOR(i,0,n-1) cin >> A[i];
+    FOR(i,0,n-1) cin >> B[i];
+
+    FOR(i,0,n) go[i] = dp[i] = INF;
+
+    dp[0] = 0;
+    FOR(i,0,n-1)
+    {
+       FOR(j,0,i)
+       {
+           go[j + 1] = min(go[j + 1], dp[j] + B[i]);
+           go[j] = min(go[j], dp[j] + A[i] + j * c);
+       }
+       FOR(i,0,n)
+       {
+           dp[i] = go[i];
+           go[i] = INF;
+       }
+    }
+
+    LL prin = INF;
+
+    FOR(i,0,n)
+        prin = min(prin, dp[i]);
+
+    cout << prin << endl;
+
+    return 0;
+}
