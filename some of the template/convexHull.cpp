@@ -14,11 +14,13 @@ int n, cost;
 
 ///Convex hull for a equation that define cost like (a - b) * (a - b) + c where a and c is known
 /// and solBag is for minimizing cost
+///https://open.kattis.com/problems/coveredwalkway
 class solBag
 {
     public:
     int start; LL preVal;
     LD x1, y1, x2, y2;
+
 
     solBag() {}
     solBag(LL ss,LL pp){
